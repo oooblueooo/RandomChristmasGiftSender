@@ -1,0 +1,652 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>圣诞礼物随机抽取器</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #1a472a 0%, #0d2818 100%);
+            color: #fff;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 800px;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .container::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 1px, transparent 1px);
+            background-size: 20px 20px;
+            animation: snowfall 20s linear infinite;
+            z-index: -1;
+        }
+
+        @keyframes snowfall {
+            0% {
+                transform: translateY(0) rotate(0deg);
+            }
+
+            100% {
+                transform: translateY(20px) rotate(5deg);
+            }
+        }
+
+        h1 {
+            font-size: 2.8rem;
+            margin-bottom: 10px;
+            color: #ffdd40;
+            text-shadow: 0 0 10px rgba(255, 221, 64, 0.5);
+            position: relative;
+        }
+
+        h1::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 150px;
+            height: 3px;
+            background: linear-gradient(90deg, transparent, #ffdd40, transparent);
+        }
+
+        .subtitle {
+            font-size: 1.2rem;
+            margin-bottom: 30px;
+            color: #c8e6c9;
+        }
+
+        .gift-box {
+            width: 200px;
+            height: 200px;
+            margin: 30px auto;
+            position: relative;
+            cursor: pointer;
+            transition: transform 0.5s;
+        }
+
+        .gift-box:hover {
+            transform: scale(1.05);
+        }
+
+        .box {
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(45deg, #d32f2f, #f44336);
+            border-radius: 15px;
+            position: relative;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.5s;
+        }
+
+        .box.open {
+            transform: scale(0.9);
+            opacity: 0.8;
+        }
+
+        .ribbon {
+            position: absolute;
+            width: 100%;
+            height: 40px;
+            background: #4caf50;
+            top: -20px;
+            border-radius: 5px;
+            box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .ribbon::before,
+        .ribbon::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 0;
+            border-left: 30px solid transparent;
+            border-right: 30px solid transparent;
+            border-bottom: 20px solid #388e3c;
+        }
+
+        .ribbon::before {
+            top: 20px;
+            left: -30px;
+        }
+
+        .ribbon::after {
+            top: 20px;
+            right: -30px;
+        }
+
+        .bow {
+            position: absolute;
+            width: 60px;
+            height: 60px;
+            background: #ffeb3b;
+            border-radius: 50%;
+            top: -40px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 2;
+            box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .bow::before,
+        .bow::after {
+            content: '';
+            position: absolute;
+            width: 50px;
+            height: 50px;
+            background: #ffeb3b;
+            border-radius: 50%;
+            top: 10px;
+        }
+
+        .bow::before {
+            left: -30px;
+        }
+
+        .bow::after {
+            right: -30px;
+        }
+
+        .gift-content {
+            font-size: 3.5rem;
+            opacity: 0;
+            transition: opacity 0.5s;
+            color: #ffdd40;
+            text-shadow: 0 0 15px rgba(255, 221, 64, 0.7);
+        }
+
+        .gift-content.show {
+            opacity: 1;
+        }
+
+        .gift-name {
+            font-size: 2.2rem;
+            margin: 25px 0;
+            min-height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(0, 0, 0, 0.2);
+            padding: 15px;
+            border-radius: 15px;
+            border: 2px dashed #4caf50;
+            color: #ffdd40;
+        }
+
+        .gift-description {
+            font-size: 1.1rem;
+            margin-bottom: 30px;
+            color: #e0e0e0;
+            line-height: 1.6;
+            background: rgba(0, 0, 0, 0.2);
+            padding: 15px;
+            border-radius: 10px;
+        }
+
+        .buttons {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 15px 35px;
+            font-size: 1.2rem;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .btn-primary {
+            background: linear-gradient(45deg, #ff5722, #ff9800);
+            color: white;
+        }
+
+        .btn-secondary {
+            background: linear-gradient(45deg, #2196f3, #03a9f4);
+            color: white;
+        }
+
+        .btn:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .counter {
+            margin-top: 25px;
+            font-size: 1.1rem;
+            color: #c8e6c9;
+            background: rgba(0, 0, 0, 0.2);
+            padding: 10px 20px;
+            border-radius: 50px;
+            display: inline-block;
+        }
+
+        .message {
+            margin-top: 20px;
+            font-size: 1.1rem;
+            color: #ffcc80;
+            min-height: 30px;
+        }
+
+        .snowflake {
+            position: absolute;
+            background: white;
+            border-radius: 50%;
+            opacity: 0.8;
+            pointer-events: none;
+        }
+
+        .history {
+            margin-top: 30px;
+            width: 100%;
+            max-width: 600px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 20px;
+            text-align: left;
+        }
+
+        .history h3 {
+            color: #ffdd40;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .history-list {
+            max-height: 150px;
+            overflow-y: auto;
+            padding-right: 10px;
+        }
+
+        .history-item {
+            padding: 8px 12px;
+            margin-bottom: 8px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 8px;
+            border-left: 4px solid #4caf50;
+        }
+
+        footer {
+            margin-top: 30px;
+            color: #c8e6c9;
+            font-size: 0.9rem;
+            text-align: center;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 20px;
+            }
+
+            h1 {
+                font-size: 2rem;
+            }
+
+            .gift-box {
+                width: 150px;
+                height: 150px;
+            }
+
+            .gift-name {
+                font-size: 1.7rem;
+                min-height: 70px;
+            }
+
+            .btn {
+                padding: 12px 25px;
+                font-size: 1rem;
+            }
+
+            .buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1><i class="fas fa-gift"></i> 圣诞礼物抽取器</h1>
+        <p class="subtitle">点击礼物盒随机抽取一份圣诞礼物，如果不满意可以重新抽取！</p>
+
+        <div class="gift-box" id="giftBox">
+            <div class="ribbon"></div>
+            <div class="bow"></div>
+            <div class="box" id="box">
+                <div class="gift-content" id="giftIcon">?</div>
+            </div>
+        </div>
+
+        <div class="gift-name" id="giftName">等待抽取礼物...</div>
+        <div class="gift-description" id="giftDescription">点击上面的礼物盒来随机抽取一份圣诞礼物，祝你好运！</div>
+
+        <div class="buttons">
+            <button class="btn btn-primary" id="drawBtn">
+                <i class="fas fa-random"></i> 抽取礼物
+            </button>
+            <button class="btn btn-secondary" id="redrawBtn" disabled>
+                <i class="fas fa-redo"></i> 重新抽取
+            </button>
+        </div>
+
+        <div class="counter">
+            已抽取次数: <span id="drawCount">0</span>
+        </div>
+
+        <div class="message" id="message"></div>
+    </div>
+
+    <div class="history">
+        <h3><i class="fas fa-history"></i> 抽取历史</h3>
+        <div class="history-list" id="historyList">
+            <!-- 历史记录将在这里显示 -->
+        </div>
+    </div>
+
+    <footer>
+        <p>祝你圣诞快乐！愿你收到的礼物带给你惊喜和快乐！</p>
+        <p>© 2023 圣诞礼物抽取器 | 设计：圣诞精灵</p>
+    </footer>
+
+    <script>
+        // 礼物数据
+        const gifts = [
+            {
+                name: "圣诞暖心围巾",
+                description: "手工编织的红色圣诞围巾，带有雪花图案，温暖整个冬天。",
+                icon: "🧣"
+            },
+            {
+                name: "圣诞姜饼屋套装",
+                description: "包含制作姜饼屋的所有材料，与家人一起享受DIY的乐趣。",
+                icon: "🍪"
+            },
+            {
+                name: "限量版圣诞巧克力",
+                description: "瑞士进口圣诞主题巧克力，每颗都有独特的圣诞造型。",
+                icon: "🍫"
+            },
+            {
+                name: "圣诞音乐盒",
+                description: "播放《铃儿响叮当》的精致音乐盒，内部有旋转的圣诞老人。",
+                icon: "🎵"
+            },
+            {
+                name: "圣诞主题马克杯",
+                description: "陶瓷马克杯，杯身印有可爱的圣诞图案，倒入热水会变色。",
+                icon: "☕"
+            },
+            {
+                name: "圣诞袜礼包",
+                description: "内含5双不同款式的圣诞袜，每双都有独特的圣诞元素。",
+                icon: "🧦"
+            },
+            {
+                name: "圣诞树装饰套装",
+                description: "包含各种精美的圣诞树挂饰、彩灯和树顶星。",
+                icon: "🎄"
+            },
+            {
+                name: "圣诞老人玩偶",
+                description: "会唱歌的圣诞老人玩偶，按下按钮会播放圣诞歌曲。",
+                icon: "🎅"
+            },
+            {
+                name: "圣诞主题拼图",
+                description: "1000片圣诞夜景拼图，完成后可以装裱起来装饰房间。",
+                icon: "🧩"
+            },
+            {
+                name: "圣诞香薰蜡烛",
+                description: "松木和肉桂香味的香薰蜡烛，为房间带来节日气氛。",
+                icon: "🕯️"
+            },
+            {
+                name: "圣诞特调咖啡豆",
+                description: "带有榛子和香草风味的圣诞限定咖啡豆，来自哥伦比亚。",
+                icon: "🫘"
+            },
+            {
+                name: "圣诞毛衣",
+                description: "带有LED灯饰的圣诞毛衣，按下开关会闪烁彩色灯光。",
+                icon: "🧥"
+            }
+        ];
+
+        // DOM元素
+        const giftBox = document.getElementById('giftBox');
+        const box = document.getElementById('box');
+        const giftIcon = document.getElementById('giftIcon');
+        const giftName = document.getElementById('giftName');
+        const giftDescription = document.getElementById('giftDescription');
+        const drawBtn = document.getElementById('drawBtn');
+        const redrawBtn = document.getElementById('redrawBtn');
+        const drawCountElement = document.getElementById('drawCount');
+        const messageElement = document.getElementById('message');
+        const historyList = document.getElementById('historyList');
+
+        // 状态变量
+        let drawCount = 0;
+        let currentGift = null;
+        let isAnimating = false;
+        let history = [];
+
+        // 初始化
+        function init() {
+            drawBtn.addEventListener('click', drawGift);
+            redrawBtn.addEventListener('click', drawGift);
+            giftBox.addEventListener('click', drawGift);
+
+            // 创建雪花
+            createSnowflakes();
+        }
+
+        // 抽取礼物
+        function drawGift() {
+            if (isAnimating) return;
+
+            isAnimating = true;
+
+            // 重置UI状态
+            box.classList.remove('open');
+            giftIcon.classList.remove('show');
+            giftIcon.textContent = '?';
+            giftName.textContent = '抽取中...';
+            giftDescription.textContent = '圣诞老人正在为你准备礼物，请稍候...';
+            messageElement.textContent = '';
+            redrawBtn.disabled = true;
+
+            // 开始动画
+            setTimeout(() => {
+                box.classList.add('open');
+
+                setTimeout(() => {
+                    // 随机选择礼物
+                    let randomIndex;
+                    do {
+                        randomIndex = Math.floor(Math.random() * gifts.length);
+                    } while (gifts[randomIndex] === currentGift && gifts.length > 1);
+
+                    currentGift = gifts[randomIndex];
+
+                    // 更新UI
+                    giftIcon.textContent = currentGift.icon;
+                    giftIcon.classList.add('show');
+
+                    setTimeout(() => {
+                        giftName.textContent = currentGift.name;
+                        giftDescription.textContent = currentGift.description;
+
+                        // 增加抽取次数
+                        drawCount++;
+                        drawCountElement.textContent = drawCount;
+
+                        // 添加到历史记录
+                        addToHistory(currentGift);
+
+                        // 显示消息
+                        const messages = [
+                            "圣诞快乐！希望你喜欢这份礼物！",
+                            "这份礼物充满了圣诞的祝福！",
+                            "圣诞老人特意为你挑选了这份礼物！",
+                            "愿这份礼物带给你节日的喜悦！",
+                            "祝你有个美好的圣诞季！"
+                        ];
+                        const randomMessage = messages[Math.floor(Math.random() * messages.length)];
+                        messageElement.textContent = randomMessage;
+
+                        // 启用重新抽取按钮
+                        redrawBtn.disabled = false;
+
+                        isAnimating = false;
+                    }, 500);
+                }, 800);
+            }, 100);
+        }
+
+        // 添加到历史记录
+        function addToHistory(gift) {
+            const now = new Date();
+            const timeString = `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}:${now.getSeconds().toString().padStart(2, '0')}`;
+
+            history.unshift({
+                gift: gift,
+                time: timeString
+            });
+
+            // 只保留最近5条记录
+            if (history.length > 5) {
+                history.pop();
+            }
+
+            // 更新历史记录显示
+            updateHistoryDisplay();
+        }
+
+        // 更新历史记录显示
+        function updateHistoryDisplay() {
+            historyList.innerHTML = '';
+
+            if (history.length === 0) {
+                historyList.innerHTML = '<div class="history-item">暂无抽取历史</div>';
+                return;
+            }
+
+            history.forEach(item => {
+                const historyItem = document.createElement('div');
+                historyItem.className = 'history-item';
+                historyItem.innerHTML = `
+                    <strong>${item.gift.name}</strong> (${item.gift.icon})
+                    <span style="float: right; color: #ffcc80; font-size: 0.9rem;">${item.time}</span>
+                `;
+                historyList.appendChild(historyItem);
+            });
+        }
+
+        // 创建雪花效果
+        function createSnowflakes() {
+            const snowflakeCount = 50;
+
+            for (let i = 0; i < snowflakeCount; i++) {
+                createSnowflake();
+            }
+        }
+
+        function createSnowflake() {
+            const snowflake = document.createElement('div');
+            snowflake.className = 'snowflake';
+
+            // 随机大小
+            const size = Math.random() * 10 + 5;
+            snowflake.style.width = `${size}px`;
+            snowflake.style.height = `${size}px`;
+
+            // 随机位置
+            snowflake.style.left = `${Math.random() * 100}vw`;
+            snowflake.style.top = `-20px`;
+
+            // 随机透明度
+            snowflake.style.opacity = Math.random() * 0.5 + 0.3;
+
+            document.body.appendChild(snowflake);
+
+            // 动画
+            const duration = Math.random() * 10 + 10;
+            const horizontalMovement = Math.random() * 100 - 50;
+
+            snowflake.animate([
+                { transform: `translate(0, 0) rotate(0deg)` },
+                { transform: `translate(${horizontalMovement}px, 100vh) rotate(${Math.random() * 360}deg)` }
+            ], {
+                duration: duration * 1000,
+                easing: 'linear'
+            });
+
+            // 动画结束后移除并创建新的雪花
+            setTimeout(() => {
+                snowflake.remove();
+                createSnowflake();
+            }, duration * 1000);
+        }
+
+        // 页面加载完成后初始化
+        window.addEventListener('DOMContentLoaded', init);
+
+        // 初始化历史记录显示
+        updateHistoryDisplay();
+    </script>
+</body>
+
+</html>
